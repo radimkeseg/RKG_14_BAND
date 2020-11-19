@@ -50,6 +50,7 @@ int peakpause;
 };
 Point spectrum[ROWS][COLUMNS];
 TopPoint peakhold[COLUMNS];
+TopPoint spechold[COLUMNS];
 int spectrumValue[COLUMNS];
 long int counter = 0;
 int long pwmpulse = 0;
@@ -110,10 +111,8 @@ void loop()
 #ifdef DEBUG  
     Serial.print(spectrumValue[i]); Serial.write(",");
 #endif
-  if(spectrumValue[i] < 120)spectrumValue[i] = 0;
-  spectrumValue[i] = constrain(spectrumValue[i], 0, 1023);
 //  spectrumValue[i] = log10(spectrumValue[i])/3*1023;
-  spectrumValue[i] = map(spectrumValue[i], 0, 1023, 0, ROWS);
+  spectrumValue[i] = map(spectrumValue[i], 120, 1023, 0, ROWS);
   
 
   if((i+1)%2) //strobe once read twice
@@ -123,10 +122,17 @@ void loop()
 #ifdef DEBUG  
     Serial.println("");
 #endif
+
+
   
   for(int j = 0; j < COLUMNS; j++){
+    if(spectrumValue[j] > spechold[j].position)
+     {
+      spechold[j].position = spectrumValue[j];
+      spechold[j].peakpause = spectrumValue[j]/2;
+    }
     for(int i = 0; i < ROWS; i++){ 
-      if(i<spectrumValue[j]){  
+      if(i<spechold[j].position){  
         spectrum[i][j].active = 1;
         spectrum[i][j].r =i*32;           //COLUMN Color red
         spectrum[i][j].g =255;         //COLUMN Color green
@@ -142,7 +148,7 @@ void loop()
     if(spectrumValue[j] > peakhold[j].position)
      {
       peakhold[j].position = spectrumValue[j];
-      peakhold[j].peakpause = spectrumValue[j];//8; //set peakpause
+      peakhold[j].peakpause = spectrumValue[j]*4;
     }
     else
     {
@@ -156,7 +162,7 @@ void loop()
  
   flushMatrix();
 
-  if(counter > 3) { topSinking(); counter=0; } //peak delay
+  if(counter > 3) { topSinking(); spectrumSinking(); counter=0; } //peak delay
 }
   
 void topSinking()
@@ -166,6 +172,16 @@ void topSinking()
     if(peakhold[j].position > 0 && peakhold[j].peakpause <= 0) peakhold[j].position--;
     else if(peakhold[j].peakpause > 0) peakhold[j].peakpause--;       
   } 
+}
+
+void spectrumSinking()
+{
+  for(int j = 0; j < COLUMNS; j++)
+  {
+    if(spechold[j].position > 0 && spechold[j].peakpause <= 0) spechold[j].position--;
+    else if(spechold[j].peakpause > 0) spechold[j].peakpause--;       
+  } 
+ 
 }
 
 void clearspectrum()
