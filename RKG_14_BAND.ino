@@ -1,16 +1,6 @@
-//   Project: 14 Band Spectrum Analyzer using WS2812B/SK6812
-//   Target Platform: Arduino Mega2560 or Mega2560 PRO MINI  
-//   The original code has been modified by PLATINUM to allow a scalable platform with many more bands.
-//   It is not possible to run modified code on a UNO,NANO or PRO MINI. due to memory limitations.
-//   The library Si5351mcu is being utilized for programming masterclock IC frequencies. 
-//   Special thanks to Pavel Milanes for his outstanding work. https://github.com/pavelmc/Si5351mcu
-//   Analog reading of MSGEQ7 IC1 and IC2 use pin A0 and A1.
-//   Clock pin from MSGEQ7 IC1 and IC2 to Si5351mcu board clock 0 and 1
-//   Si5351mcu SCL and SDA use pin 20 and 21
-//   See the Schematic Diagram for more info
-//   Programmed and tested by PLATINUM
-//   Version 1.0    
-//***************************************************************************************************
+/*********************************************************************
+14 BAND EQUALIZER by Radim Keseg
+*********************************************************************/
 
 #include <Adafruit_NeoPixel.h>
 #include <si5351mcu.h>    //Si5351mcu library
